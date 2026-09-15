@@ -9,36 +9,37 @@ Your implementation should allow users to visit new pages and navigate **backwar
 
 #### **Requirements**
 
-1. **visitPage(url: string): void**
-* Adds a new page to the history.
-* If a new page is visited after going back, remove all forward history.
+  1. **visitPage(url: string): void**
 
+     * Adds a new page to the history.
 
-2. **goBack(): string | null**
-* Moves back to the previous page in history.
-* Returns `null` if there is no previous page.
+     * If a new page is visited after going back, remove all forward history.
 
+  2. **goBack(): string | null**
 
-3. **goForward(): string | null**
-* Moves forward to the next page in history.
-* Returns `null` if there is no next page.
+     * Moves back to the previous page in history.
 
+     * Returns `null` if there is no previous page.
 
-4. **getCurrentPage(): string | null**
-* Returns the URL of the current page.
+  3. **goForward(): string | null**
 
+     * Moves forward to the next page in history.
 
+     * Returns `null` if there is no next page.
+
+  4. **getCurrentPage(): string | null**
+
+     * Returns the URL of the current page.
 
 #### **Constraints**
 
-* Must use a **Doubly Linked List** for history storage.
-* No built-in arrays or lists allowed for storing history directly.
+  * Must use a **Doubly Linked List** for history storage.
 
----
+  * No built-in arrays or lists allowed for storing history directly.
 
 ### **🛠 Implementation (React + TypeScript)**
 
-```typescript
+```tsx
 import { useState } from "react";
 
 /**
@@ -159,10 +160,7 @@ const BrowserHistoryComponent = () => {
 };
 
 export default BrowserHistoryComponent;
-
 ```
-
----
 
 ## **Infinite Image Carousel (Circular Linked List)**
 
@@ -173,31 +171,31 @@ Users should be able to navigate between images seamlessly, where the last image
 
 #### **Requirements**
 
-1. **addImage(url: string): void**
-* Adds a new image to the carousel.
+  1. **addImage(url: string): void**
 
+     * Adds a new image to the carousel.
 
-2. **nextImage(): string**
-* Moves to the next image in the sequence.
-* Loops back to the first image if at the last image.
+  2. **nextImage(): string**
 
+     * Moves to the next image in the sequence.
 
-3. **prevImage(): string**
-* Moves to the previous image in the sequence.
-* Loops back to the last image if at the first image.
+     * Loops back to the first image if at the last image.
 
+  3. **prevImage(): string**
 
-4. **getCurrentImage(): string | null**
-* Returns the current image URL.
+     * Moves to the previous image in the sequence.
 
+     * Loops back to the last image if at the first image.
 
+  4. **getCurrentImage(): string | null**
+
+     * Returns the current image URL.
 
 #### **Constraints**
 
-* Must use a **Circular Linked List** to store images.
-* No built-in arrays or lists allowed for storing images directly.
+  * Must use a **Circular Linked List** to store images.
 
----
+  * No built-in arrays or lists allowed for storing images directly.
 
 ## **LRU Cache for API Responses (LRU Cache with Doubly Linked List + HashMap)**
 
@@ -208,28 +206,29 @@ The cache should remove the **least recently accessed data** when full.
 
 #### **Requirements**
 
-1. **put(key: string, value: string): void**
-* Stores a key-value pair in the cache.
-* If the cache is full, removes the **least recently used item** before adding the new item.
+  1. **put(key: string, value: string): void**
 
+     * Stores a key-value pair in the cache.
 
-2. **get(key: string): string | null**
-* Retrieves the value associated with a given key.
-* If the key is not found, return `null`.
-* Marks the accessed key as **most recently used**.
+     * If the cache is full, removes the **least recently used item** before adding the new item.
 
+  2. **get(key: string): string | null**
 
-3. **size(): number**
-* Returns the current size of the cache.
+     * Retrieves the value associated with a given key.
 
+     * If the key is not found, return `null`.
 
+     * Marks the accessed key as **most recently used**.
+
+  3. **size(): number**
+
+     * Returns the current size of the cache.
 
 #### **Constraints**
 
-* Must use a **Doubly Linked List** and **HashMap** for efficient cache management.
-* No built-in Map, Set, or caching libraries allowed.
+  * Must use a **Doubly Linked List** and **HashMap** for efficient cache management.
 
----
+  * No built-in Map, Set, or caching libraries allowed.
 
 ## **Social Media Activity Feed (Doubly Linked List)**
 
@@ -240,20 +239,20 @@ The system should maintain a list of recent activities and allow users to naviga
 
 #### **Requirements**
 
-1. **addActivity(activity: string): void**
-* Adds a new activity to the feed (most recent first).
+  1. **addActivity(activity: string): void**
 
+     * Adds a new activity to the feed (most recent first).
 
-2. **deleteActivity(index: number): void**
-* Removes an activity at the specified index.
+  2. **deleteActivity(index: number): void**
 
+     * Removes an activity at the specified index.
 
-3. **showActivities(): string[]**
-* Returns all activities in order (most recent first).
+  3. **showActivities(): string[]**
 
-
+     * Returns all activities in order (most recent first).
 
 #### **Constraints**
 
-* Must use a **Doubly Linked List** to store activities.
-* No built-in arrays or lists allowed for storing activities directly.
+  * Must use a **Doubly Linked List** to store activities.
+
+  * No built-in arrays or lists allowed for storing activities directly.
