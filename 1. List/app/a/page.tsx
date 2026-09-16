@@ -1,3 +1,4 @@
+'use client'
 import { useState } from "react";
 
 /**
@@ -33,27 +34,14 @@ class BrowserHistory {
 
     this.current = newNode;
   }
-
-  /**
-   * Moves back in history.
-   */
   goBack(): string | null {
-    if (this.current?.prev) {
-      this.current = this.current.prev;
-      return this.current.url;
-    }
-    return null;
+    if (this.current?.prev) this.current = this.current.prev;
+    return this.getCurrentPage();
   }
 
-  /**
-   * Moves forward in history.
-   */
   goForward(): string | null {
-    if (this.current?.next) {
-      this.current = this.current.next;
-      return this.current.url;
-    }
-    return null;
+    if (this.current?.next) this.current = this.current.next;
+    return this.getCurrentPage();
   }
 
   /**
@@ -70,11 +58,11 @@ class BrowserHistory {
 const BrowserHistoryComponent = () => {
   const [history] = useState(() => new BrowserHistory());
   const [currentPage, setCurrentPage] = useState<string | null>(null);
-
   const visitPage = () => {
     const newPage = `Page ${Math.floor(Math.random() * 100)}`;
     history.visitPage(newPage);
     setCurrentPage(history.getCurrentPage());
+    console.log(history.getCurrentPage())
   };
 
   const goBack = () => {
