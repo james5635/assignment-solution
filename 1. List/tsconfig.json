@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/a/page.tsx", "app/a/page.jsx", "app/a/x.jsx"  ],
+, "app/browser-history-manager/page.tsx", "app/browser-history-manager/page.jsx", "app/browser-history-manager/x.jsx"  ],
   "exclude": ["node_modules"]
 }
