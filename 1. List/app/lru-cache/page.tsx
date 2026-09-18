@@ -176,12 +176,14 @@ class LRUCache {
   }
 }
 
-const CAPACITY = 5;
+const CAPACITY = 3;
 
 const MOCK_API_RESPONSES: Record<string, string> = {
   "/api/user/1": '{"id":1,"name":"Alice"}',
   "/api/user/2": '{"id":2,"name":"Bob"}',
   "/api/user/3": '{"id":3,"name":"Carol"}',
+  "/api/user/4": '{"id":4,"name":"Mike"}',
+  "/api/user/5": '{"id":5,"name":"Joe"}',
   "/api/posts": '[{"id":1,"title":"Hello"},{"id":2,"title":"List ops"}]',
   "/api/todos": '[{"id":1,"text":"Visit pages"},{"id":2,"text":"Go back"}]',
 };
