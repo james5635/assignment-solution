@@ -27,6 +27,7 @@ interface List<T> {
     erase(n: ListNode<T>): void;
 
     clearForward(): void
+    moveToFront(n: ListNode<T>): void;
 
 }
 class DoublyLinkedList<T> implements List<T> {
@@ -186,5 +187,16 @@ class DoublyLinkedList<T> implements List<T> {
         this.cursor.next = null;
         this.tail = this.cursor;
     }
+
+    moveToFront(n: ListNode<T>): void {
+        if (n === this.head) return;
+        if (n.prev) n.prev.next = n.next; else this.head = n.next;
+        if (n.next) n.next.prev = n.prev; else this.tail = n.prev;
+        n.prev = null;
+        n.next = this.head;
+        if (this.head) this.head.prev = n;
+        this.head = n;
+        if (!this.tail) this.tail = n;
+    }
 }
-export { DoublyLinkedList }
+export { DoublyLinkedList, ListNode}

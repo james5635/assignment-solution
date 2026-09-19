@@ -1,70 +1,9 @@
 'use client'
 import { useState } from "react";
+import { DoublyLinkedList } from "../list";
+import { HashMap } from "../map";
 
-/**
- * Node in the doubly linked list that tracks recency order.
- * The head of the list is the most recently used entry.
- */
-class CacheNode {
-  key: string;
-  value: string;
-  prev: CacheNode | null = null;
-  next: CacheNode | null = null;
-
-  constructor(key: string, value: string) {
-    this.key = key;
-    this.value = value;
-  }
-}
-
-/**
- * A small HashMap implemented from scratch (the problem forbids the
- * built-in `Map`/`Set`). Keys are hashed into an array of buckets and
- * collisions are handled with chaining (per-bucket arrays).
- */
-class HashMap {
-  private buckets: Array<Array<{ key: string; value: CacheNode }>>;
-  private count = 0;
-
-  constructor(capacity = 16) {
-    this.buckets = Array.from({ length: capacity }, () => []);
-  }
-
-  private bucketIndex(key: string): number {
-    let hash = 0;
-    for (let i = 0; i < key.length; i++) {
-      hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-    }
-    return hash % this.buckets.length;
-  }
-
-  get(key: string): CacheNode | undefined {
-    const bucket = this.buckets[this.bucketIndex(key)];
-    const entry = bucket.find((e) => e.key === key);
-    return entry ? entry.value : undefined;
-  }
-
-  set(key: string, value: CacheNode): void {
-    const bucket = this.buckets[this.bucketIndex(key)];
-    const entry = bucket.find((e) => e.key === key);
-    if (entry) {
-      entry.value = value;
-      return;
-    }
-    bucket.push({ key, value });
-    this.count++;
-  }
-
-  remove(key: string): void {
-    const index = this.bucketIndex(key);
-    const bucket = this.buckets[index];
-    const entryIndex = bucket.findIndex((e) => e.key === key);
-    if (entryIndex !== -1) {
-      bucket.splice(entryIndex, 1);
-      this.count--;
-    }
-  }
-}
+type Entry = { key: string; value: string };
 
 interface LRUCache {
   get(key: string): string | null
@@ -74,113 +13,61 @@ interface LRUCache {
   getOrder(): { key: string; value: string }[]
 }
 
-/**
- * LRU cache for API responses backed by a doubly linked list (recency
- * order) plus a HashMap (O(1) lookup by key).
- */
+
 class LinkedListHashMapLRUCache implements LRUCache {
+  private list = new DoublyLinkedList<Entry>();
+  private map = new HashMap<Entry>();
   private capacity: number;
-  private map: HashMap;
-  private head: CacheNode | null = null; // most recently used
-  private tail: CacheNode | null = null; // least recently used
-  private count = 0;
   private lastEvictedKey: string | null = null;
 
   constructor(capacity: number) {
     this.capacity = capacity;
-    this.map = new HashMap();
   }
 
-  /**
-   * Retrieves a value and marks the key as most recently used.
-   */
   get(key: string): string | null {
     const node = this.map.get(key);
     if (!node) return null;
-
-    this.moveToFront(node);
-    return node.value;
+    this.list.moveToFront(node);
+    return node.e.value;
   }
 
-  /**
-   * Stores a key-value pair, evicting the least recently used item
-   * when the cache is full.
-   */
   put(key: string, value: string): void {
     const existing = this.map.get(key);
     if (existing) {
-      existing.value = value;
-      this.moveToFront(existing);
+      existing.e.value = value;   // mutate payload, node identity survives
+      this.list.moveToFront(existing);
       return;
     }
 
-    if (this.count >= this.capacity) {
-      this.evict();
-    }
+    if (this.list.size() >= this.capacity) this.evict();
 
-    const node = new CacheNode(key, value);
-    this.addToFront(node);
-    this.map.set(key, node);
-    this.count++;
+    this.list.insertFront({ key, value });
+    const node = this.list.begin()
+    this.map.set(key, node!);
   }
 
-  /**
-   * Returns the current size of the cache.
-   */
   size(): number {
-    return this.count;
+    return this.list.size();        // single source of truth, drop `count`
   }
-
-  /**
-   * Returns the key of the most recently evicted item (if any) and resets it.
-   */
   getLastEvictedKey(): string | null {
     const key = this.lastEvictedKey;
     this.lastEvictedKey = null;
     return key;
   }
 
-  /**
-   * Traverses the list from most recent to least recent for rendering.
-   */
-  getOrder(): { key: string; value: string }[] {
-    const order: { key: string; value: string }[] = [];
-    let node = this.head;
-    while (node) {
-      order.push({ key: node.key, value: node.value });
-      node = node.next;
-    }
-    return order;
+  getOrder(): Entry[] {
+    const out: Entry[] = [];
+    for (let n = this.list.begin(); n !== null; n = n.next) out.push(n.e);
+    return out;
   }
 
-  private addToFront(node: CacheNode): void {
-    node.prev = null;
-    node.next = this.head;
-    if (this.head) this.head.prev = node;
-    this.head = node;
-    if (!this.tail) this.tail = node;
-  }
-
-  private removeNode(node: CacheNode): void {
-    if (node.prev) node.prev.next = node.next;
-    else this.head = node.next;
-    if (node.next) node.next.prev = node.prev;
-    else this.tail = node.prev;
-  }
-
-  private moveToFront(node: CacheNode): void {
-    if (node === this.head) return;
-    this.removeNode(node);
-    this.addToFront(node);
-  }
 
   private evict(): void {
-    if (!this.tail) return;
-    const lru = this.tail;
-    this.lastEvictedKey = lru.key;
-    this.removeNode(lru);
-    this.map.remove(lru.key);
-    this.count--;
+    const lru = this.list.end();
+    if (!lru) return;
+    this.lastEvictedKey = lru.e.key;
+    this.map.remove(lru.e.key);
+    this.list.eraseBack();
   }
 }
 
