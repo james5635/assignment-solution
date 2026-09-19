@@ -1,19 +1,6 @@
 'use client'
 import { useState } from "react";
-
-/**
- * Represents a node in the doubly linked list.
- */
-class ListNode {
-  url: string;
-  prev: ListNode | null = null;
-  next: ListNode | null = null;
-
-  constructor(url: string) {
-    this.url = url;
-  }
-}
-
+import { DoublyLinkedList } from "../list";
 
 interface BrowserHistory {
   visitPage(url: string): void
@@ -21,50 +8,27 @@ interface BrowserHistory {
   goForward(): string | null
   getCurrentPage(): string | null
 }
-
-/**
- * Manages browser history using a doubly linked list.
- */
 class LinkedListBrowserHistory implements BrowserHistory {
-  private current: ListNode | null = null;
+  private list = new DoublyLinkedList();
 
-  /**
-   * Visits a new page and clears forward history.
-   */
-  visitPage(url: string) {
-    const newNode = new ListNode(url);
-
-    if (this.current) {
-      this.current.next = null; // Clear forward history
-      newNode.prev = this.current;
-      this.current.next = newNode;
-    }
-
-    this.current = newNode;
+  visitPage(url: string): void {
+    this.list.clearForward();
+    this.list.insertBack(url);
+    this.list.forward()
   }
 
-  /**
-   * Moves back in history.
-   */
   goBack(): string | null {
-    if (this.current?.prev) this.current = this.current.prev;
-    return this.getCurrentPage();
-
+    this.list.back();
+    return this.list.current();
   }
 
-  /**
-   * Moves forward in history.
-   */
   goForward(): string | null {
-    if (this.current?.next) this.current = this.current.next;
-    return this.getCurrentPage();
+    this.list.forward();
+    return this.list.current();
   }
 
-  /**
-   * Returns the current page URL.
-   */
   getCurrentPage(): string | null {
-    return this.current ? this.current.url : null;
+    return this.list.current();
   }
 }
 
