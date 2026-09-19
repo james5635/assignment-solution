@@ -1,5 +1,6 @@
 'use client'
 import { useState } from "react";
+import { DoublyLinkedList } from "../list";
 
 const DEMO_IMAGES = [
   "https://picsum.photos/seed/1/640/400",
@@ -7,23 +8,6 @@ const DEMO_IMAGES = [
   "https://picsum.photos/seed/3/640/400",
   "https://picsum.photos/seed/4/640/400",
 ];
-
-/**
- * Represents a node in the circular doubly linked list.
- * A new node points to itself on both sides, keeping the circle
- * valid even when it is the only node in the list.
- */
-class ListNode {
-  url: string;
-  prev: ListNode;
-  next: ListNode;
-
-  constructor(url: string) {
-    this.url = url;
-    this.prev = this;
-    this.next = this;
-  }
-}
 
 interface ImageCarousel {
   addImage(url: string): void
@@ -36,49 +20,40 @@ interface ImageCarousel {
  * Manages the carousel images using a circular linked list.
  */
 class LinkedListImageCarousel implements ImageCarousel {
-  private current: ListNode | null = null;
+  private list: DoublyLinkedList = new DoublyLinkedList();
 
   /**
    * Adds a new image. The last image's next pointer wraps around to the
    * first image, so navigation never hits a dead end.
    */
   addImage(url: string): void {
-    const node = new ListNode(url);
+    this.list.insertBack(url);
+    this.list.begin()!.prev = this.list.end()
+    this.list.end()!.next = this.list.begin()
 
-    if (!this.current) {
-      this.current = node;
-      return;
-    }
-
-    node.next = this.current;
-    node.prev = this.current.prev;
-    this.current.prev.next = node;
-    this.current.prev = node;
   }
 
   /**
    * Moves to the next image, looping back to the first one at the end.
    */
   nextImage(): string {
-    if (!this.current) return "";
-    this.current = this.current.next;
-    return this.current.url;
+    this.list.forward();
+    return this.list.current()!;
   }
 
   /**
    * Moves to the previous image, looping back to the last one at the start.
    */
   prevImage(): string {
-    if (!this.current) return "";
-    this.current = this.current.prev;
-    return this.current.url;
+    this.list.back();
+    return this.list.current()!
   }
 
   /**
    * Returns the current image URL.
    */
   getCurrentImage(): string | null {
-    return this.current ? this.current.url : null;
+    return this.list.current()
   }
 }
 

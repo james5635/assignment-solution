@@ -1,87 +1,60 @@
 'use client'
 import { useState } from "react";
-
-/**
- * Represents a node in the doubly linked activity feed.
- */
-class FeedNode {
-  activity: string;
-  prev: FeedNode | null = null;
-  next: FeedNode | null = null;
-
-  constructor(activity: string) {
-    this.activity = activity;
-  }
-}
+import { DoublyLinkedList } from "../list";
 
 interface ActivityFeed {
   addActivity(activity: string): void
   deleteActivity(index: number): void
   showActivities(): string[]
 }
-
-/**
- * Social media activity feed backed by a doubly linked list.
- * The head of the list is the most recent activity.
- */
 class LinkedListActivityFeed implements ActivityFeed {
-  private head: FeedNode | null = null;
-  private tail: FeedNode | null = null;
-  private count = 0;
+  private list = new DoublyLinkedList();
 
   /**
-   * Adds a new activity to the front of the feed (most recent first).
+   * Adds a new activity to the front of the feed
+   * (most recent first).
    */
   addActivity(activity: string): void {
-    const node = new FeedNode(activity);
-    node.next = this.head;
-
-    if (this.head) {
-      this.head.prev = node;
-    } else {
-      this.tail = node;
-    }
-
-    this.head = node;
-    this.count++;
+    this.list.insertFront(activity);
   }
 
   /**
-   * Removes the activity at the given index (0 = most recent).
+   * Removes the activity at the given index
+   * (0 = most recent).
    */
   deleteActivity(index: number): void {
-    if (index < 0 || index >= this.count) return;
+    if (index < 0 || index >= this.list.size()) {
+      return;
+    }
 
-    let node = this.head;
+    let node = this.list.begin();
+
     for (let i = 0; i < index && node; i++) {
       node = node.next;
     }
 
-    if (!node) return;
-
-    if (node.prev) node.prev.next = node.next;
-    else this.head = node.next;
-
-    if (node.next) node.next.prev = node.prev;
-    else this.tail = node.prev;
-
-    this.count--;
+    if (node) {
+      this.list.erase(node);
+    }
   }
 
   /**
-   * Returns all activities in order (most recent first).
+   * Returns all activities in order
+   * (most recent first).
    */
   showActivities(): string[] {
     const activities: string[] = [];
-    let node = this.head;
+
+    let node = this.list.begin();
+
     while (node) {
-      activities.push(node.activity);
+      activities.push(node.e);
       node = node.next;
     }
+
     return activities;
   }
 }
-
 const DEMO_ACTIVITIES = [
   "Alice liked your post",
   "Bob commented: \"Nice work!\"",
