@@ -14,11 +14,17 @@ class FeedNode {
   }
 }
 
+interface ActivityFeed {
+  addActivity(activity: string): void
+  deleteActivity(index: number): void
+  showActivities(): string[]
+}
+
 /**
  * Social media activity feed backed by a doubly linked list.
  * The head of the list is the most recent activity.
  */
-class ActivityFeed {
+class LinkedListActivityFeed implements ActivityFeed {
   private head: FeedNode | null = null;
   private tail: FeedNode | null = null;
   private count = 0;
@@ -88,7 +94,7 @@ const DEMO_ACTIVITIES = [
  */
 const ActivityFeedComponent = () => {
   const [feed] = useState(() => {
-    const f = new ActivityFeed();
+    const f = new LinkedListActivityFeed();
     DEMO_ACTIVITIES.forEach((activity) => f.addActivity(activity));
     return f;
   });

@@ -66,11 +66,19 @@ class HashMap {
   }
 }
 
+interface LRUCache {
+  get(key: string): string | null
+  put(key: string, value: string): void
+  size(): number
+  getLastEvictedKey(): string | null
+  getOrder(): { key: string; value: string }[]
+}
+
 /**
  * LRU cache for API responses backed by a doubly linked list (recency
  * order) plus a HashMap (O(1) lookup by key).
  */
-class LRUCache {
+class LinkedListHashMapLRUCache implements LRUCache {
   private capacity: number;
   private map: HashMap;
   private head: CacheNode | null = null; // most recently used
@@ -192,7 +200,7 @@ const MOCK_API_RESPONSES: Record<string, string> = {
  * React component demonstrating the LRU cache.
  */
 const LRUCacheComponent = () => {
-  const [cache] = useState(() => new LRUCache(CAPACITY));
+  const [cache] = useState(() => new LinkedListHashMapLRUCache(CAPACITY));
   const [order, setOrder] = useState<{ key: string; value: string }[]>([]);
   const [size, setSize] = useState(0);
   const [keyInput, setKeyInput] = useState("");

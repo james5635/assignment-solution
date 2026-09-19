@@ -14,10 +14,18 @@ class ListNode {
   }
 }
 
+
+interface BrowserHistory {
+  visitPage(url: string): void
+  goBack(): string | null
+  goForward(): string | null
+  getCurrentPage(): string | null
+}
+
 /**
  * Manages browser history using a doubly linked list.
  */
-class BrowserHistory {
+class LinkedListBrowserHistory implements BrowserHistory {
   private current: ListNode | null = null;
 
   /**
@@ -64,7 +72,7 @@ class BrowserHistory {
  * React component for managing browser history.
  */
 const BrowserHistoryComponent = () => {
-  const [history] = useState(() => new BrowserHistory());
+  const [history] = useState(() => new LinkedListBrowserHistory());
   const [currentPage, setCurrentPage] = useState<string | null>(null);
   const visitPage = () => {
     const newPage = `Page ${Math.floor(Math.random() * 100)}`;

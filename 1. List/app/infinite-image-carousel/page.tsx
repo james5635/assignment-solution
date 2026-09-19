@@ -25,10 +25,17 @@ class ListNode {
   }
 }
 
+interface ImageCarousel {
+  addImage(url: string): void
+  nextImage(): string
+  prevImage(): string
+  getCurrentImage(): string | null
+}
+
 /**
  * Manages the carousel images using a circular linked list.
  */
-class ImageCarousel {
+class LinkedListImageCarousel implements ImageCarousel {
   private current: ListNode | null = null;
 
   /**
@@ -80,7 +87,7 @@ class ImageCarousel {
  */
 const InfiniteImageCarousel = () => {
   const [carousel] = useState(() => {
-    const c = new ImageCarousel();
+    const c = new LinkedListImageCarousel();
     DEMO_IMAGES.forEach((url) => c.addImage(url));
     return c;
   });
