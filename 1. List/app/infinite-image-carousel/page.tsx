@@ -20,7 +20,7 @@ interface ImageCarousel {
  * Manages the carousel images using a circular linked list.
  */
 class LinkedListImageCarousel implements ImageCarousel {
-  private list: DoublyLinkedList = new DoublyLinkedList();
+  private list: DoublyLinkedList<string> = new DoublyLinkedList<string>();
 
   /**
    * Adds a new image. The last image's next pointer wraps around to the

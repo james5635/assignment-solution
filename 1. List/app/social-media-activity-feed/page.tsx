@@ -8,7 +8,7 @@ interface ActivityFeed {
   showActivities(): string[]
 }
 class LinkedListActivityFeed implements ActivityFeed {
-  private list = new DoublyLinkedList();
+  private list = new DoublyLinkedList<string>();
 
   /**
    * Adds a new activity to the front of the feed

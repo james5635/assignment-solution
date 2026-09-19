@@ -9,7 +9,7 @@ interface BrowserHistory {
   getCurrentPage(): string | null
 }
 class LinkedListBrowserHistory implements BrowserHistory {
-  private list = new DoublyLinkedList();
+  private list = new DoublyLinkedList<string>();
 
   visitPage(url: string): void {
     this.list.clearForward();

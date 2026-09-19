@@ -1,45 +1,45 @@
-class ListNode {
-    e: string;
-    prev: ListNode | null = null;
-    next: ListNode | null = null;
+class ListNode<T> {
+    e: T;
+    prev: ListNode<T> | null = null;
+    next: ListNode<T> | null = null;
 
-    constructor(e: string) {
+    constructor(e: T) {
         this.e = e;
     }
 }
 
-interface List {
-    begin(): ListNode | null;
-    end(): ListNode | null;
+interface List<T> {
+    begin(): ListNode<T> | null;
+    end(): ListNode<T> | null;
 
     size(): number
 
-    current(): string | null
+    current(): T | null
     back(): void
     forward(): void
 
-    insertFront(e: string): void;
-    insertBack(e: string): void;
-    insert(n: ListNode, e: string): void;
+    insertFront(e: T): void;
+    insertBack(e: T): void;
+    insert(n: ListNode<T>, e: T): void;
 
     eraseFront(): void;
     eraseBack(): void;
-    erase(n: ListNode): void;
+    erase(n: ListNode<T>): void;
 
     clearForward(): void
 
 }
-class DoublyLinkedList implements List {
-    private head: ListNode | null = null;
-    private tail: ListNode | null = null;
-    private cursor: ListNode | null = null;
+class DoublyLinkedList<T> implements List<T> {
+    private head: ListNode<T> | null = null;
+    private tail: ListNode<T> | null = null;
+    private cursor: ListNode<T> | null = null;
     private count = 0;
 
-    begin(): ListNode | null {
+    begin(): ListNode<T> | null {
         return this.head;
     }
 
-    end(): ListNode | null {
+    end(): ListNode<T> | null {
         return this.tail;
     }
 
@@ -47,7 +47,7 @@ class DoublyLinkedList implements List {
         return this.count;
     }
 
-    current(): string | null {
+    current(): T | null {
         return this.cursor?.e ?? null;
     }
 
@@ -63,8 +63,8 @@ class DoublyLinkedList implements List {
         }
     }
 
-    insertFront(e: string): void {
-        const node = new ListNode(e);
+    insertFront(e: T): void {
+        const node = new ListNode<T>(e);
 
         if (this.head === null) {
             this.head = node;
@@ -79,8 +79,8 @@ class DoublyLinkedList implements List {
         this.count++;
     }
 
-    insertBack(e: string): void {
-        const node = new ListNode(e);
+    insertBack(e: T): void {
+        const node = new ListNode<T>(e);
 
         if (this.tail === null) {
             this.head = node;
@@ -95,8 +95,8 @@ class DoublyLinkedList implements List {
         this.count++;
     }
 
-    insert(n: ListNode, e: string): void {
-        const node = new ListNode(e);
+    insert(n: ListNode<T>, e: T): void {
+        const node = new ListNode<T>(e);
 
         node.next = n;
         node.prev = n.prev;
@@ -150,7 +150,7 @@ class DoublyLinkedList implements List {
         this.count--;
     }
 
-    erase(n: ListNode): void {
+    erase(n: ListNode<T>): void {
         if (n === this.cursor) {
             this.cursor = n.next ?? n.prev;
         }
@@ -173,18 +173,18 @@ class DoublyLinkedList implements List {
         this.count--;
     }
 
-clearForward(): void {
-    if (this.cursor === null) return;
+    clearForward(): void {
+        if (this.cursor === null) return;
 
-    let node = this.cursor.next;
+        let node = this.cursor.next;
 
-    while (node !== null) {
-        node = node.next;
-        this.count--;
+        while (node !== null) {
+            node = node.next;
+            this.count--;
+        }
+
+        this.cursor.next = null;
+        this.tail = this.cursor;
     }
-
-    this.cursor.next = null;
-    this.tail = this.cursor;
-}
 }
 export { DoublyLinkedList }
