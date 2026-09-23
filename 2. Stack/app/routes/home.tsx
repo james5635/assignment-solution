@@ -1,7 +1,6 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "New React Router App" },
     { name: "description", content: "Welcome to React Router!" },
@@ -9,5 +8,14 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Welcome />;
+  return (
+    <>
+      <a href="browser-navigation-history">browser-navigation-history</a>
+      <br />
+      <a href="nested-modal-stack">nested-modal-stack</a>
+      <br />
+      <a href="undo-redo-text-editor">undo-redo-text-editor</a>
+      <br />
+    </>
+  )
 }
