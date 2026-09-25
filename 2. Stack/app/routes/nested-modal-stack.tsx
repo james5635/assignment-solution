@@ -34,7 +34,7 @@ export default function NestedModalStack() {
           Open Settings
         </button>
 
-        <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white rounded py-2 px-4" onClick={() => openModal('confirm')}>
+        <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white rounded py-2 px-4" onClick={() => openModal('profile')}>
           Open Profile
         </button>
       </div>
