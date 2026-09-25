@@ -7,4 +7,9 @@ export class Stack<T> {
         return this.items.pop()!
     }
     get length(): number { return this.items.length }
+    clone(): Stack<T> {
+        const s = new Stack<T>()
+        s.items = [...this.items]
+        return s
+    }
 }
