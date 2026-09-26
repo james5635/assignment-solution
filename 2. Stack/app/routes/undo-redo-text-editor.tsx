@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Stack } from './stack';
+import { Stack } from '../stack';
 
 export default function UndoRedoEditor() {
   const [text, setText] = useState('');
