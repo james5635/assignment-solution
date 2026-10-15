@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+/*
 @layer base {
   :root {
     @apply text-[rgba(255,255,255,0.87)] bg-[#242424] font-sans;
@@ -47,4 +47,4 @@ body::before {
   ::after {
     animation: none !important;
   }
-}
+}*/
