@@ -44,8 +44,21 @@ export function resetFileSystem(): void {
 
 resetFileSystem();
 
+function normalizePath(path: string): string {
+  const parts = path.trim().split("/").filter(Boolean);
+  return parts.length === 0 ? ROOT_PATH : `/${parts.join("/")}`;
+}
+
+function parentPathOf(path: string): string {
+  const idx = path.lastIndexOf("/");
+  return idx <= 0 ? ROOT_PATH : path.substring(0, idx);
+}
+
 export function buildFileSystemTree(rootPath: string): DirectoryTree {
-  const build = (path: string, parent: FileSystemEntry | null): FileSystemEntry => {
+  const build = (
+    path: string,
+    parent: FileSystemEntry | null
+  ): FileSystemEntry => {
     const node = physicalFS.get(path)!;
     const entry: FileSystemEntry = {
       path,
@@ -59,15 +72,16 @@ export function buildFileSystemTree(rootPath: string): DirectoryTree {
       .map((child) => build(child, entry));
     return entry;
   };
-  return { root: build(rootPath, null) };
+  return { root: build(normalizePath(rootPath), null) };
 }
 
 export function findEntryByPath(
   tree: DirectoryTree,
   path: string
 ): FileSystemEntry | null {
-  if (path === tree.root.path) return tree.root;
-  const parts = path.split("/").filter(Boolean);
+  const normalized = normalizePath(path);
+  if (normalized === tree.root.path) return tree.root;
+  const parts = normalized.split("/").filter(Boolean);
   let current = tree.root;
   for (const part of parts) {
     const next = current.children.find((child) => child.name === part);
@@ -83,12 +97,20 @@ export function insertEntry(
   entryName: string,
   isDirectory: boolean
 ): void {
-  const parentPhysical = physicalFS.get(parentPath);
-  if (!parentPhysical || !parentPhysical.isDirectory) {
-    throw new Error(`Parent directory not found: ${parentPath}`);
+  const cleanName = entryName.trim();
+  if (cleanName === "" || cleanName.includes("/")) {
+    throw new Error("Entry name must be non-empty and contain no '/'");
   }
-  const newPath =
-    parentPath === ROOT_PATH ? `/${entryName}` : `${parentPath}/${entryName}`;
+
+  const normalizedParent = normalizePath(parentPath);
+  const parentPhysical = physicalFS.get(normalizedParent);
+  if (!parentPhysical || !parentPhysical.isDirectory) {
+    throw new Error(`Parent directory not found: ${normalizedParent}`);
+  }
+
+  const newPath = `${
+    normalizedParent === ROOT_PATH ? "" : normalizedParent
+  }/${cleanName}`;
   if (physicalFS.has(newPath)) {
     throw new Error(`Entry already exists: ${newPath}`);
   }
@@ -96,11 +118,11 @@ export function insertEntry(
   physicalFS.set(newPath, { isDirectory, children: new Set() });
   parentPhysical.children.add(newPath);
 
-  const parentEntry = findEntryByPath(tree, parentPath);
+  const parentEntry = findEntryByPath(tree, normalizedParent);
   if (parentEntry) {
     parentEntry.children.push({
       path: newPath,
-      name: entryName,
+      name: cleanName,
       isDirectory,
       parent: parentEntry,
       children: [],
@@ -109,12 +131,13 @@ export function insertEntry(
 }
 
 export function deleteEntryByPath(tree: DirectoryTree, path: string): void {
-  if (path === ROOT_PATH) {
+  const normalized = normalizePath(path);
+  if (normalized === ROOT_PATH) {
     throw new Error("Cannot delete the root directory");
   }
-  const entry = findEntryByPath(tree, path);
+  const entry = findEntryByPath(tree, normalized);
   if (!entry) {
-    throw new Error(`Entry not found: ${path}`);
+    throw new Error(`Entry not found: ${normalized}`);
   }
 
   const remove = (p: string): void => {
@@ -123,7 +146,12 @@ export function deleteEntryByPath(tree: DirectoryTree, path: string): void {
     node.children.forEach(remove);
     physicalFS.delete(p);
   };
-  remove(path);
+  remove(normalized);
+
+  const parentPhysical = physicalFS.get(parentPathOf(normalized));
+  if (parentPhysical) {
+    parentPhysical.children.delete(normalized);
+  }
 
   if (entry.parent) {
     entry.parent.children = entry.parent.children.filter((c) => c !== entry);

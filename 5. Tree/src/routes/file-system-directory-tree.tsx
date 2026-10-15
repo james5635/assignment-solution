@@ -22,7 +22,7 @@ export function FileSystemDirectoryTree() {
   const [found, setFound] = useState<FileSystemEntry | null>(null);
   const [message, setMessage] = useState("");
 
-  const sync = (t: DirectoryTree) => setTree({ root: { ...t.root } });
+  const sync = () => setTree(buildFileSystemTree(ROOT_PATH));
 
   const renderEntry = (entry: FileSystemEntry, depth: number): React.ReactElement => (
     <div key={entry.path} style={{ paddingLeft: depth * 20 }}>
@@ -65,7 +65,7 @@ export function FileSystemDirectoryTree() {
           onClick={() => {
             try {
               insertEntry(tree, parentPath, entryName, isDirectory);
-              sync(tree);
+              sync();
               setMessage(`Inserted ${entryName}`);
             } catch (err) {
               setMessage((err as Error).message);
@@ -88,7 +88,7 @@ export function FileSystemDirectoryTree() {
           onClick={() => {
             try {
               deleteEntryByPath(tree, deletePath);
-              sync(tree);
+              sync();
               setMessage(`Deleted ${deletePath}`);
             } catch (err) {
               setMessage((err as Error).message);
@@ -115,7 +115,7 @@ export function FileSystemDirectoryTree() {
           className="bg-gray-500 hover:bg-gray-700 font-bold text-white rounded py-2 px-4 ml-4"
           onClick={() => {
             resetFileSystem();
-            setTree(buildFileSystemTree(ROOT_PATH));
+            sync();
             setMessage("Filesystem reset");
           }}
         >
