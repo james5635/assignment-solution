@@ -1,23 +1,26 @@
-import { APITester } from "./APITester";
+import { useMemo } from "react";
+import { BrowserRouter, Routes, Route } from "react-router";
+import { DictionaryApp } from "./routes/dictionary";
+import { Home } from "./routes/home";
+import { createTrie, insertWord } from "./trie";
 import "./index.css";
 
-import logo from "./logo.svg";
-import reactLogo from "./react.svg";
-
 export function App() {
-  return (
-    <div className="app">
-      <div className="logo-container">
-        <img src={logo} alt="Bun Logo" className="logo bun-logo" />
-        <img src={reactLogo} alt="React Logo" className="logo react-logo" />
-      </div>
+  const trie = useMemo(() => {
+    const t = createTrie();
+    ["app", "apple", "application", "banana", "band", "cat"].forEach((w) =>
+      insertWord(t, w)
+    );
+    return t;
+  }, []);
 
-      <h1>Bun + React</h1>
-      <p>
-        Edit <code>src/App.tsx</code> and save to test HMR
-      </p>
-      <APITester />
-    </div>
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dictionary" element={<DictionaryApp trie={trie} />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
