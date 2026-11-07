@@ -1,16 +1,8 @@
 import { useState } from 'react';
-import { HashTable } from '@/hash-table';
-
-function generateFileHash(fileContent: string): string {
-  let hash = 5381;
-  for (let i = 0; i < fileContent.length; i++) {
-    hash = (hash * 33 + fileContent.charCodeAt(i)) % 1000000007;
-  }
-  return hash.toString(36) + fileContent.length.toString(36);
-}
+import { FileIntegrityChecker } from '@/lib/file-integrity-checker';
 
 export function HashBasedFileIntegrityCheck() {
-  const [fileTable] = useState(() => new HashTable<string, string>());
+  const [checker] = useState(() => new FileIntegrityChecker());
   const [storedHashes, setStoredHashes] = useState<Record<string, string>>({});
   const [fileName, setFileName] = useState('report.txt');
   const [fileContent, setFileContent] = useState(
@@ -18,24 +10,13 @@ export function HashBasedFileIntegrityCheck() {
   );
   const [message, setMessage] = useState('');
 
-  function storeFileHash(fileName: string, fileContent: string): void {
-    const hash = generateFileHash(fileContent);
-    fileTable.set(fileName, hash);
+  function handleStoreFileHash() {
+    const hash = checker.storeFileHash(fileName, fileContent);
     setStoredHashes((prev) => ({ ...prev, [fileName]: hash }));
   }
 
-  function verifyFileIntegrity(fileName: string, fileContent: string): string {
-    const stored = fileTable.get(fileName);
-    if (stored === undefined) {
-      setMessage('No stored hash for this file');
-      return 'No stored hash for this file';
-    }
-    const result =
-      stored === generateFileHash(fileContent)
-        ? 'File is intact'
-        : 'File has been modified';
-    setMessage(result);
-    return result;
+  function handleVerifyFileIntegrity() {
+    setMessage(checker.verifyFileIntegrity(fileName, fileContent));
   }
 
   return (
@@ -62,13 +43,13 @@ export function HashBasedFileIntegrityCheck() {
       <div className="flex gap-4 mt-4">
         <button
           className="bg-blue-500 hover:bg-blue-700 font-bold text-white rounded py-2 px-4"
-          onClick={() => storeFileHash(fileName, fileContent)}>
+          onClick={handleStoreFileHash}>
           Store File Hash
         </button>
 
         <button
           className="bg-green-500 hover:bg-green-700 font-bold text-white rounded py-2 px-4"
-          onClick={() => verifyFileIntegrity(fileName, fileContent)}>
+          onClick={handleVerifyFileIntegrity}>
           Verify Integrity
         </button>
       </div>
